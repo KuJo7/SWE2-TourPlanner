@@ -8,13 +8,13 @@ namespace TourPlanner.BLL
 {
     public static class AppManagerFactory
     {
-        private static IAppManager manager;
+        private static IAppManagerFactory manager;
 
-        public static IAppManager GetFactoryManager()
+        public static IAppManagerFactory GetFactoryManager()
         {
             if(manager == null)
             {
-                manager = new AppManagerImpl();
+                manager = new AppManagerFactoryImpl();
             }
             return manager;
         }

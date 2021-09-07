@@ -33,6 +33,7 @@ namespace TourPlanner.ViewModels
 
         public bool CanExecute(object parameter)
         {
+            Debug.Print("CanExecute");
             return canExecutePredicate == null ? true : canExecutePredicate(parameter);
         }
 
