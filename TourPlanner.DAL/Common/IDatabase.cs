@@ -18,6 +18,5 @@ namespace TourPlanner.DAL.Common
         IDataReader ExecuteReader(DbCommand command);
 
         int ExecuteScalar(DbCommand command);
-
     }
 }
