@@ -6,40 +6,48 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Security.Cryptography;
 using TourPlanner.BLL;
 using TourPlanner.Models;
+using TourPlanner.Views;
 
 
 namespace TourPlanner.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly IAppManagerFactory _tourManager;
+        private readonly IAppManagerFactory _appManagerFactory;
         private TourItem _currentTour;
-        private string _searchName;
-        private bool _isSelected;
+        private LogItem _currentLog;
+        private string _search;
+
 
         public ObservableCollection<TourItem> Tours { get; set; }
+        public ObservableCollection<LogItem> Logs { get; set; }
 
         public ICommand SearchCommand { get; set; }
-
         public ICommand ClearCommand { get; set; }
 
-        public ICommand DeleteCommand { get; set; }
-        public ICommand AddCommand { get; set; }
-        public ICommand UpdateCommand { get; set; }
-        public ICommand CopyCommand { get; set; }
+        public ICommand CreateTourCommand { get; set; }
+        public ICommand DeleteTourCommand { get; set; }
+        public ICommand CopyTourCommand { get; set; }
+        public ICommand UpdateTourCommand { get; set; }
+
+        public ICommand CreateLogCommand { get; set; }
+        public ICommand DeleteLogCommand { get; set; }
+        public ICommand UpdateLogCommand { get; set; }
 
 
-        public string SearchName
+        public string Search
         {
-            get => _searchName;
+            get => _search;
             set
             {
-                if (_searchName != value)
+                if (_search != value)
                 {
-                    _searchName = value;
-                    RaisePropertyChangedEvent(nameof(SearchName));
+                    _search = value;
+                    RaisePropertyChangedEvent(nameof(Search));
                 }
             }
         }
@@ -51,115 +59,166 @@ namespace TourPlanner.ViewModels
             {
                 if ((_currentTour != value) && (value != null))
                 {
-                    _isSelected = true;
                     _currentTour = value;
+                    Logs.Clear();
+                    FillLogsListView();
                     RaisePropertyChangedEvent(nameof(CurrentTour));
                 }
-                else
+            }
+        }
+        
+        public LogItem CurrentLog
+        {
+            get => _currentLog;
+            set
+            {
+                if ((_currentLog != value) && (value != null))
                 {
-                    _isSelected = false;
+                    _currentLog = value;
+                    RaisePropertyChangedEvent(nameof(CurrentLog));
                 }
             }
         }
 
-        public MainViewModel(IAppManagerFactory tourManager)
+
+        public MainViewModel(IAppManagerFactory appManagerFactory)
         {
-            this._tourManager = tourManager;
+            this._appManagerFactory = appManagerFactory;
             Tours = new ObservableCollection<TourItem>();
 
             this.SearchCommand = new RelayCommand(o =>
             {
-                IEnumerable<TourItem> tours = tourManager.SearchForTours(SearchName);
+                
+                FillToursListView();
+                List<TourItem> tours = appManagerFactory.SearchForTours(Search).ToList();
+
+                foreach (TourItem item in Tours)
+                {
+                    if (appManagerFactory.SearchForLogs(item, Search))
+                    {
+                        tours.Add(item);
+                    }
+                }
+
+                tours = tours.Distinct().ToList();
+
                 Tours.Clear();
-                foreach(TourItem item in tours)
+                Logs.Clear();
+                foreach (TourItem item in tours)
                 {
                     Tours.Add(item);
                 }
-            },
-            o =>
-            {
-                Debug.Print("CanExecute SearchCommand");
-                return !string.IsNullOrEmpty(_searchName);
+
             });
 
             this.ClearCommand = new RelayCommand(o => {
-                Tours.Clear();
-                SearchName = "";
+                Search = "";
 
-                FillListView();
-            },
-            o =>
-            {
-                Debug.Print("CanExecute ClearCommand");
-                return !string.IsNullOrEmpty(_searchName);
+                FillToursListView();
+                FillLogsListView();
             });
 
-            this.DeleteCommand = new RelayCommand(o =>
+            this.DeleteTourCommand = new RelayCommand(o =>
             {
-
-                tourManager.DeleteTour(CurrentTour);
-
-
-            },
-                o =>
+                Tours.Remove(appManagerFactory.DeleteTour(CurrentTour));
+                IEnumerable<LogItem> logsOfCurrentTour = Logs.Where(x => x.TourItem.Id.Equals(CurrentTour.Id));
+                
+                foreach (LogItem item in logsOfCurrentTour)
+                {
+                    if (CurrentTour != null)
+                    {
+                        appManagerFactory.DeleteLog(item);
+                    }
+                }
+                FillLogsListView();
+            }); 
+            
+            this.UpdateTourCommand = new RelayCommand(o =>
             {
-                Debug.Print("CanExecute DeleteCommand");
-
-                return _isSelected;
+                var view = new UpdateTourWindow(this, CurrentTour);
+                view.ShowDialog();
             });
 
-            this.UpdateCommand = new RelayCommand(o =>
+            this.CopyTourCommand = new RelayCommand(o =>
+            {
+
+                TourItem copiedTour = appManagerFactory.CreateTour(CurrentTour);
+                Tours.Add(copiedTour);
+
+                IEnumerable<LogItem> logsOfCurrentTour = Logs.Where(x => x.TourItem.Id.Equals(CurrentTour.Id));
+
+                foreach (LogItem item in logsOfCurrentTour)
                 {
+                    if (CurrentTour != null)
+                    {
+                        appManagerFactory.CreateLog(copiedTour, item.DateTime, item.Report, item.Distance, item.TotalTime, item.Rating, item.AverageSpeed, 
+                            item.MaxSpeed, item.MinSpeed, item.AverageStepCount, item.BurntCalories);
+                    }
+                }
+                FillLogsListView();
 
-                    tourManager.UpdateTour(CurrentTour, "newTestName", "newRoutInfoTest", "newTestDescription", 50.0);
+            });
 
+            this.CreateTourCommand = new RelayCommand(o =>
+            {
+                var view = new AddTourWindow(this);
+                view.ShowDialog();
+            });
 
-
-                },
-                o =>
+            this.DeleteLogCommand = new RelayCommand(o =>
+            {
+                if (CurrentTour != null)
                 {
-                    Debug.Print("CanExecute UpdateCommand");
+                    Logs.Remove(appManagerFactory.DeleteLog(CurrentLog));
+                }
 
-                    return _isSelected;
-                });
+            });
 
-            this.CopyCommand = new RelayCommand(o =>
-                {
+            this.UpdateLogCommand = new RelayCommand(o => 
+            {
+                var view = new UpdateLogWindow(this, CurrentTour, CurrentLog);
+                view.ShowDialog();
+            });
 
-                    Tours.Add(tourManager.CopyTour(CurrentTour, "newTestName", "newRoutInfoTest", "new TestDescription"));
-
-
-
-                },
-                o =>
-                {
-                    Debug.Print("CanExecute CopyCommand");
-
-                    return _isSelected;
-                });
-
-            this.AddCommand = new RelayCommand(o =>
-                {
-                    Tours.Add(tourManager.AddTour(new TourItem(){Name = "TEST"}));
-
-                });
-
-            InitListView();
-
+            this.CreateLogCommand = new RelayCommand(o =>
+            {
+                var view = new AddLogWindow(this, CurrentTour);
+                view.ShowDialog();
+            });
+            InitToursListView();
+            InitLogsListView();
         }
 
-        public void InitListView()
+
+        public void InitToursListView()
         {
             Tours = new ObservableCollection<TourItem>();
-            FillListView();
+            FillToursListView();
         }
 
-        private void FillListView()
+        public void FillToursListView()
         {
-            foreach (TourItem item in _tourManager.GetTours())
+            Tours.Clear();
+            foreach (TourItem item in this._appManagerFactory.GetTours())
             {
                 Tours.Add(item);
             }
+        }
+        
+        public void InitLogsListView()
+        {
+            Logs = new ObservableCollection<LogItem>();
+            FillLogsListView();
+        }
+
+        public void FillLogsListView()
+        {
+            Logs.Clear();
+            if(CurrentTour != null)
+                foreach (LogItem item in this._appManagerFactory.GetLogs(CurrentTour))
+                {
+                    Logs.Add(item);
+                }
         }
     }
 }

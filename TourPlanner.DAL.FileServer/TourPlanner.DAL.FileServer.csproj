@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TourPlanner.DAL\TourPlanner.DAL.csproj" />
+  </ItemGroup>
 
 </Project>

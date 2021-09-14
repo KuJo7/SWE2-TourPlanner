@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:TourPlanner.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
-        Title="Tour-Planner" Height="450" Width="650" MinHeight="250" MinWidth="300">
+        Title="Tour-Planner" Height="600" Width="947" MinHeight="350" MinWidth="650">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -41,8 +41,9 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Margin="5" Text="{Binding SearchName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <Button Grid.Column="1" Margin="1" Height="20" Command="{Binding SearchCommand}">Search</Button>
+            <TextBox Grid.Column="0" Margin="5" Name="SearchBox" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Button Grid.Column="1" Margin="1" Height="20" 
+                    Command="{Binding SearchCommand}" IsEnabled="{Binding ElementName=SearchBox, Path=Text.Length}">Search</Button>
             <Button Grid.Column="2" Margin="1" Height="20" Command="{Binding ClearCommand}">Clear</Button>
         </Grid>
         <Grid Grid.Row ="2">
@@ -65,25 +66,28 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Height="30">Tours</Label>
-                    <Button Grid.Column="1" Margin="1" Height="20" Width="20" Command="{Binding AddCommand}">+</Button>
-                    <Button Grid.Column="2" Margin="1" Height="20" Width="20" Command="{Binding DeleteCommand}">-</Button>
-                    <Button Grid.Column="3" Margin="1" Height="20" Width="20" Command="{Binding CopyCommand}">#</Button>
-                    <Button Grid.Column="4" Margin="1" Height="20" Width="20" Command="{Binding UpdateCommand}">...</Button>
+                    <Button Grid.Column="1" Margin="1" Height="20" Width="20" Command="{Binding CreateTourCommand}">+</Button>
+                    <Button Grid.Column="2" Margin="1" Height="20" Width="20" 
+                            Command="{Binding DeleteTourCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}">-</Button>
+                    <Button Grid.Column="3" Margin="1" Height="20" Width="20" 
+                            Command="{Binding CopyTourCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}">#</Button>
+                    <Button Grid.Column="4" Margin="1" Height="20" Width="20" 
+                            Command="{Binding UpdateTourCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}">...</Button>
                 </Grid>
                 <Grid Grid.Row="1">
                     <ListBox                     
                         Name="listTours" 
                         ItemsSource="{Binding Tours}"
-                        SelectedItem="{Binding CurrentTour}"
+                        SelectedItem="{Binding Path=CurrentTour, Mode=TwoWay}"
                         DisplayMemberPath="Name" 
                     />
 
                 </Grid>
 
             </Grid>
-            
-                <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF3A5B7F"/>
-            
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF3A5B7F"/>
+
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" MinHeight="100"/>
@@ -92,16 +96,42 @@
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Background="#FF6889BA">
                     <TabControl Name="DetailedTour">
-                        <TabItem Header="Route">
-                            <Label Content="Route goes here..." />
+                        <TabItem Header="General">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" Content="Start:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="End:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="Distance:" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold"/>
+
+                                <Label Grid.Row="0" Grid.Column="1" Content="{Binding CurrentTour.From }" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal"/>
+                                <Label Grid.Row="1" Grid.Column="1" Content="{Binding CurrentTour.To}" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal"/>
+                                <Label Grid.Row="2" Grid.Column="1" Content="{Binding CurrentTour.Distance}" HorizontalAlignment="Left" VerticalAlignment="Center" ContentStringFormat="{}{0:0.##} km" FontWeight="Normal"/>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Map">
+                            <Image Source="{Binding CurrentTour.ImagePath}" Stretch="UniformToFill"/>
                         </TabItem>
                         <TabItem Header="Description">
-                            <Label Content="Description goes here..." />
+                            <Label Content="{Binding CurrentTour.Description}" />
                         </TabItem>
+                        <TabItem Header="RouteInfo">
+                            <Label Content="{Binding CurrentTour.RouteInformation}" />
+                        </TabItem>
+
                     </TabControl>
                 </Grid>
-               
-                    <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF3A5B7F"/>
+
+                <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF3A5B7F"/>
 
                 <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
@@ -116,12 +146,31 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Height="30">Logs</Label>
-                        <Button Grid.Column="1" Margin="1" Height="20" Width="20">+</Button>
-                        <Button Grid.Column="2" Margin="1" Height="20" Width="20">-</Button>
-                        <Button Grid.Column="3" Margin="1" Height="20" Width="20">...</Button>
+                        <Button Grid.Column="1" Margin="1" Height="20" Width="20" 
+                                Command="{Binding CreateLogCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}">+</Button>
+                        <Button Grid.Column="2" Margin="1" Height="20" Width="20" 
+                                Command="{Binding DeleteLogCommand}" IsEnabled="{Binding ElementName=listLogs, Path=SelectedItems.Count}">-</Button>
+                        <Button Grid.Column="3" Margin="1" Height="20" Width="20" 
+                                Command="{Binding UpdateLogCommand}" IsEnabled="{Binding ElementName=listLogs, Path=SelectedItems.Count}">...</Button>
                     </Grid>
                     <Grid Grid.Row="1">
-                        <Label Content="Content goes here..." />
+                        <DataGrid Name="listLogs"  Grid.Row="1" ItemsSource="{Binding Logs}" SelectedItem="{Binding Path=CurrentLog, Mode=TwoWay}"
+                                  AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False"
+                                  ScrollViewer.CanContentScroll="True">
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding DateTime, StringFormat='d'}"/>
+                                <DataGridTextColumn Header="Report" Binding="{Binding Report}"/>
+                                <DataGridTextColumn Header="Rating" Binding="{Binding Rating, StringFormat='P0'}"/>
+                                <DataGridTextColumn Header="Distance" Binding="{Binding Distance, StringFormat='0.##'}"/>
+                                <DataGridTextColumn Header="Totaltime" Binding="{Binding TotalTime}"/>
+                                <DataGridTextColumn Header="Average Speed" Binding="{Binding AverageSpeed}"/>
+                                <DataGridTextColumn Header="Average Step Count" Binding="{Binding AverageStepCount}"/>
+                                <DataGridTextColumn Header="Max Speed" Binding="{Binding MaxSpeed}"/>
+                                <DataGridTextColumn Header="Min Speed" Binding="{Binding MinSpeed}"/>
+                                <DataGridTextColumn Header="BurntCalories" Binding="{Binding BurntCalories}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
                 </Grid>
             </Grid>

@@ -9,12 +9,17 @@ namespace TourPlanner.DAL.DAO
 {
     public interface ILogItemDAO
     {
-        TourItem FindById(Guid itemId);
+        LogItem FindById(int id);
 
-        LogItem AddNewItem(TourItem tourItem, DateTime datetime, string report, string distance, TimeSpan totaltime, double rating, 
-            double averagespeed, double maxspeed, double minspeed, double averagestepcount, double burntcalories); //parameter TourItem tourItem or Guid tourItemId
-        
-        IEnumerable<LogItem> GetLogs(TourItem tourItem);
+        IEnumerable<LogItem> GetLogs(TourItem tour);
+
+        LogItem AddNewItem(TourItem tour, DateTime datetime, string report, double distance, TimeSpan totaltime, double rating,
+            double averagespeed, double maxspeed, double minspeed, double averagestepcount, double burntcalories);
+
+        LogItem DeleteItem(LogItem log);
+
+        LogItem UpdateItem(LogItem log);
+
 
     }
 }
