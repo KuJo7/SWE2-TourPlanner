@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography;
+using log4net;
 using TourPlanner.BLL;
 using TourPlanner.Models;
 using TourPlanner.Views;
@@ -17,6 +18,7 @@ namespace TourPlanner.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IAppManagerFactory _appManagerFactory;
         private TourItem _currentTour;
         private LogItem _currentLog;
@@ -37,6 +39,11 @@ namespace TourPlanner.ViewModels
         public ICommand CreateLogCommand { get; set; }
         public ICommand DeleteLogCommand { get; set; }
         public ICommand UpdateLogCommand { get; set; }
+
+        public ICommand ImportCommand { get; set; }
+        public ICommand ExportCommand { get; set; }
+        public ICommand PrintTourCommand { get; set; }
+        public ICommand PrintAllCommand { get; set; }
 
 
         public string Search
@@ -88,25 +95,33 @@ namespace TourPlanner.ViewModels
 
             this.SearchCommand = new RelayCommand(o =>
             {
-                
-                FillToursListView();
-                List<TourItem> tours = appManagerFactory.SearchForTours(Search).ToList();
-
-                foreach (TourItem item in Tours)
+                try
                 {
-                    if (appManagerFactory.SearchForLogs(item, Search))
+                    FillToursListView();
+                    List<TourItem> tours = appManagerFactory.SearchForTours(Search).ToList();
+
+                    foreach (TourItem item in Tours)
                     {
-                        tours.Add(item);
+                        if (appManagerFactory.SearchForLogs(item, Search))
+                        {
+                            tours.Add(item);
+                        }
                     }
+
+                    tours = tours.Distinct().ToList();
+
+                    Tours.Clear();
+                    Logs.Clear();
+                    foreach (TourItem item in tours)
+                    {
+                        Tours.Add(item);
+                    }
+
+                    log.Info("SearchCommand successful");
                 }
-
-                tours = tours.Distinct().ToList();
-
-                Tours.Clear();
-                Logs.Clear();
-                foreach (TourItem item in tours)
+                catch (Exception ex)
                 {
-                    Tours.Add(item);
+                    log.Error("SearchCommand error. Exception: " + ex.Message);
                 }
 
             });
@@ -130,6 +145,7 @@ namespace TourPlanner.ViewModels
                         appManagerFactory.DeleteLog(item);
                     }
                 }
+                FillToursListView();
                 FillLogsListView();
             }); 
             
@@ -155,6 +171,7 @@ namespace TourPlanner.ViewModels
                             item.MaxSpeed, item.MinSpeed, item.AverageStepCount, item.BurntCalories);
                     }
                 }
+                FillToursListView();
                 FillLogsListView();
 
             });
@@ -185,6 +202,27 @@ namespace TourPlanner.ViewModels
                 var view = new AddLogWindow(this, CurrentTour);
                 view.ShowDialog();
             });
+
+            this.ImportCommand = new RelayCommand(o =>
+            {
+                Tours.Add(appManagerFactory.ImportData());
+            });
+
+            this.ExportCommand = new RelayCommand(o =>
+            {
+                appManagerFactory.ExportData(CurrentTour);
+            });
+
+            this.PrintTourCommand = new RelayCommand(o =>
+            {
+                appManagerFactory.PrintTour(CurrentTour);
+            });
+
+            this.PrintAllCommand = new RelayCommand(o =>
+            {
+                appManagerFactory.PrintAll();
+            });
+
             InitToursListView();
             InitLogsListView();
         }

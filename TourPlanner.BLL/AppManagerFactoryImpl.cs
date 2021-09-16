@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using TourPlanner.BLL.MapQuest;
 using TourPlanner.Models;
 using TourPlanner.DAL;
 using TourPlanner.DAL.Common;
@@ -44,12 +48,22 @@ namespace TourPlanner.BLL
         public TourItem CreateTour(string name, string description, string from, string to)
         {
             ITourItemDAO tourItemDAO = DALFactory.CreateTourItemDAO();
-            //IMapQuest mapQuest = new MapQuest();
-            string imagepath = "test";
-                //mapQuest.LoadImage(from, to);
-            string routeinformation = "test";
-            int distance = 0;
-            return tourItemDAO.AddNewItem(name, description, from, to, routeinformation, distance, imagepath);
+            IMapQuest mapQuest = new MapQuest.MapQuest();
+            if (mapQuest.fetchData(from, to))
+            {
+                string imagepath = mapQuest.LoadImage();
+                int distance = mapQuest.GetDistance();
+                string routeinformation = "test";
+
+                return tourItemDAO.AddNewItem(name, description, from, to, routeinformation, distance, imagepath);
+            }
+            else
+            {
+                string imagepath = "";
+                int distance = 0;
+                string routeinformation = "";
+                return null;
+            }
         }
 
         public TourItem CreateTour(TourItem tour)
@@ -96,7 +110,29 @@ namespace TourPlanner.BLL
             return logItemDAO.UpdateItem(log);
         }
 
+        public TourItem ImportData()
+        {
+            var JsonData = File.ReadAllText(ConfigurationManager.AppSettings["FilePath"] + "WG-575b63a6-42ad-47cc-b111-3386817055ee.txt");
+            var tour = JsonConvert.DeserializeObject<TourItem>(JsonData);
+            return CreateTour(tour);
+        }
 
+        public void ExportData(TourItem currentTour)
+        {
+            var fileId = Guid.NewGuid().ToString();
+            string filePath = ConfigurationManager.AppSettings["FilePath"] + currentTour.Name + "_" + fileId + ".txt";
+            var tour = JsonConvert.SerializeObject(currentTour);
+            File.WriteAllText(filePath, tour);
+        }
 
+        public void PrintTour(TourItem currentTour)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PrintAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
