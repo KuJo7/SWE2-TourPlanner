@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TourPlanner.Models
+﻿namespace TourPlanner.Models
 {
     public class TourItem
     {

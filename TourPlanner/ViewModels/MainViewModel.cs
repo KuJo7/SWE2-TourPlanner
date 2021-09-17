@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography;
 using log4net;
-using TourPlanner.BLL;
+using TourPlanner.BLL.Factory;
 using TourPlanner.Models;
 using TourPlanner.Views;
 
