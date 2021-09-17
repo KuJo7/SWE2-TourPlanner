@@ -141,7 +141,28 @@ namespace TourPlanner.DAL.Common
             return Activator.CreateInstance(logType) as ILogItemDAO;
         }
 
+        public static IFileAccess GetFileAccess()
+        {
+            if (fileAccess == null)
+            {
+                fileAccess = CreateFileAccess();
+            }
 
+            return fileAccess;
+        }
 
+        private static IFileAccess CreateFileAccess()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["StartFolderFilePath"].ConnectionString;
+            return CreateFileAccess(connectionString);
+        }
+
+        private static IFileAccess CreateFileAccess(string connectionString)
+        {
+            string fileClassName = assemblyName + ".FileAccess";
+            Type fileClass = dalAssembly.GetType(fileClassName);
+
+            return Activator.CreateInstance(fileClass, new object[] { connectionString }) as IFileAccess;
+        }
     }
 }

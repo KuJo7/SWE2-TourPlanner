@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -11,6 +12,9 @@ using TourPlanner.Models;
 using TourPlanner.DAL;
 using TourPlanner.DAL.Common;
 using TourPlanner.DAL.DAO;
+using Microsoft.Win32;
+using QuestPDF.Fluent;
+using TourPlanner.BLL.Reporting;
 
 namespace TourPlanner.BLL
 {
@@ -59,9 +63,7 @@ namespace TourPlanner.BLL
             }
             else
             {
-                string imagepath = "";
-                int distance = 0;
-                string routeinformation = "";
+
                 return null;
             }
         }
@@ -110,14 +112,20 @@ namespace TourPlanner.BLL
             return logItemDAO.UpdateItem(log);
         }
 
-        public TourItem ImportData()
+        public TourItem ImportTour()
         {
-            var JsonData = File.ReadAllText(ConfigurationManager.AppSettings["FilePath"] + "WG-575b63a6-42ad-47cc-b111-3386817055ee.txt");
+
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = ConfigurationManager.AppSettings["FilePath"];
+
+            openFileDialog.ShowDialog();
+
+            var JsonData = File.ReadAllText(openFileDialog.FileName);
             var tour = JsonConvert.DeserializeObject<TourItem>(JsonData);
             return CreateTour(tour);
         }
 
-        public void ExportData(TourItem currentTour)
+        public void ExportTour(TourItem currentTour)
         {
             var fileId = Guid.NewGuid().ToString();
             string filePath = ConfigurationManager.AppSettings["FilePath"] + currentTour.Name + "_" + fileId + ".txt";
@@ -125,14 +133,19 @@ namespace TourPlanner.BLL
             File.WriteAllText(filePath, tour);
         }
 
-        public void PrintTour(TourItem currentTour)
+        public void PrintTour(TourItem currentTour, List<LogItem> tourLogs)
         {
-            throw new NotImplementedException();
+            var fileId = Guid.NewGuid().ToString();
+            string filePath = ConfigurationManager.AppSettings["TourReportPath"] + currentTour.Name + "_" + fileId + ".pdf";
+            TourReport tourReport = new TourReport(currentTour, tourLogs);
+            tourReport.GeneratePdf(filePath);
         }
 
-        public void PrintAll()
+        public void PrintAll(List<LogItem> allLogs)
         {
-            throw new NotImplementedException();
+            string filePath = ConfigurationManager.AppSettings["SummaryReportPath"] + DateTime.Now.ToString().Replace(" ", "_").Replace(":", "_") + ".pdf";
+            SummaryReport summaryReport = new SummaryReport(allLogs);
+            summaryReport.GeneratePdf(filePath);
         }
     }
 }

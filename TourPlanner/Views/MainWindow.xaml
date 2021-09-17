@@ -17,9 +17,12 @@
             <DockPanel>
                 <Menu DockPanel.Dock="Top" Background="#FFA6A6A6">
                     <MenuItem Header="_File">
-                        <MenuItem Header="_Import" />
-                        <MenuItem Header="_Export" />
-                        <MenuItem Header="_Quit" />
+                        <MenuItem Header="_Import" Command="{Binding ImportCommand}"/>
+                        <MenuItem Header="_Export" 
+                                  Command="{Binding ExportCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}"/>
+                        <MenuItem Header="_Print Tour" 
+                                  Command="{Binding PrintTourCommand}" IsEnabled="{Binding ElementName=listTours, Path=SelectedItems.Count}"/>
+                        <MenuItem Header="_Print All" Command="{Binding PrintAllCommand}"/>
                     </MenuItem>
                     <MenuItem Header="_Edit">
                         <MenuItem Header="_Cut" />
@@ -119,7 +122,7 @@
                             </Grid>
                         </TabItem>
                         <TabItem Header="Map">
-                            <Image Source="{Binding CurrentTour.ImagePath}" Stretch="UniformToFill"/>
+                            <Image Source="{Binding CurrentTour.ImagePath}"/>
                         </TabItem>
                         <TabItem Header="Description">
                             <Label Content="{Binding CurrentTour.Description}" />

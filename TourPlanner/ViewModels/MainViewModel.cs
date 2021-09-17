@@ -64,7 +64,7 @@ namespace TourPlanner.ViewModels
             get => _currentTour;
             set
             {
-                if ((_currentTour != value) && (value != null))
+                if ((_currentTour != value))
                 {
                     _currentTour = value;
                     Logs.Clear();
@@ -145,8 +145,9 @@ namespace TourPlanner.ViewModels
                         appManagerFactory.DeleteLog(item);
                     }
                 }
+
+                CurrentTour = null;
                 FillToursListView();
-                FillLogsListView();
             }); 
             
             this.UpdateTourCommand = new RelayCommand(o =>
@@ -205,22 +206,32 @@ namespace TourPlanner.ViewModels
 
             this.ImportCommand = new RelayCommand(o =>
             {
-                Tours.Add(appManagerFactory.ImportData());
+                Tours.Add(appManagerFactory.ImportTour());
             });
 
             this.ExportCommand = new RelayCommand(o =>
             {
-                appManagerFactory.ExportData(CurrentTour);
+                appManagerFactory.ExportTour(CurrentTour);
             });
 
             this.PrintTourCommand = new RelayCommand(o =>
             {
-                appManagerFactory.PrintTour(CurrentTour);
+                appManagerFactory.PrintTour(CurrentTour, this._appManagerFactory.GetLogs(CurrentTour).ToList());
             });
 
             this.PrintAllCommand = new RelayCommand(o =>
             {
-                appManagerFactory.PrintAll();
+                var allLogs = new List<LogItem>();
+
+
+                foreach (var tour in Tours)
+                {
+                    var tourLog = this._appManagerFactory.GetLogs(tour).ToList();
+                    tourLog.ForEach(item => allLogs.Add(item));
+                }
+
+
+                appManagerFactory.PrintAll(allLogs);
             });
 
             InitToursListView();

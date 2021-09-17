@@ -19,5 +19,10 @@ namespace TourPlanner.BLL
             double averagespeed, double maxspeed, double minspeed, double averagestepcount, double burntcalories);
         LogItem DeleteLog(LogItem logItem);
         LogItem UpdateLog(LogItem logItem);
+        TourItem ImportTour();
+        void ExportTour(TourItem currentTour);
+        void PrintTour(TourItem currentTour, List<LogItem> tourLogs);
+        void PrintAll(List<LogItem> allLogs);
+
     }
 }

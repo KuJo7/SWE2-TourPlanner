@@ -85,9 +85,18 @@ namespace TourPlanner.ViewModels
 
             this.AddTourCommand = new RelayCommand(o =>
             {
-                
-                mainWindow.Tours.Add(_appManagerFactory.CreateTour(Name, Description, From, To));
-                _window?.Close();
+                var tour = _appManagerFactory.CreateTour(Name, Description, From, To);
+                if (tour != null)
+                {
+                    mainWindow.Tours.Add(tour);
+                    _window?.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Could not Add Tour.");
+                    _window?.Close();
+                }
+
             });
 
             this.CancelAddTourCommand = new RelayCommand(o =>
