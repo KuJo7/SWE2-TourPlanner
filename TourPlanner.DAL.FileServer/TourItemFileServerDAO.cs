@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourPlanner.DAL.Common;
 using TourPlanner.DAL.DAO;
 using TourPlanner.Models;

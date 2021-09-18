@@ -16,7 +16,7 @@ using Microsoft.Win32;
 using QuestPDF.Fluent;
 using TourPlanner.BLL.Reporting;
 
-namespace TourPlanner.BLL
+namespace TourPlanner.BLL.Factory
 {
     internal class AppManagerFactoryImpl : IAppManagerFactory
     {
@@ -57,7 +57,7 @@ namespace TourPlanner.BLL
             {
                 string imagepath = mapQuest.LoadImage();
                 int distance = mapQuest.GetDistance();
-                string routeinformation = "test";
+                string routeinformation = mapQuest.GetRouteInformation();
 
                 return tourItemDAO.AddNewItem(name, description, from, to, routeinformation, distance, imagepath);
             }

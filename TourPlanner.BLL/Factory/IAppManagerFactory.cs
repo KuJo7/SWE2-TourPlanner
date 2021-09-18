@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TourPlanner.Models;
 
 
-namespace TourPlanner.BLL
+namespace TourPlanner.BLL.Factory
 {
     public interface IAppManagerFactory
     {

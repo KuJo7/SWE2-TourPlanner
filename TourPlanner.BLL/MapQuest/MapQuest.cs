@@ -23,6 +23,7 @@ namespace TourPlanner.BLL.MapQuest
         private readonly string _apiKey;
         private readonly string _filePath;
         private RouteWrapper _route;
+        private List<Maneuver> _maneuver;
 
         public MapQuest()
         {
@@ -39,7 +40,9 @@ namespace TourPlanner.BLL.MapQuest
                 var directionsUrl = _baseUrl + "/directions/v2/route?key=" + _apiKey + "&from=" + from + "&to=" + to + "&outFormat=json&unit=k&locale=de_DE";
                 var data = _client.GetStringAsync(directionsUrl).Result;
                 var route = JsonConvert.DeserializeObject<RouteWrapper>(data);
+                var maneuver = route.Route.Legs[0].Maneuvers;
                 _route = route;
+                _maneuver = maneuver;
 
                 return true;
             }
@@ -83,6 +86,11 @@ namespace TourPlanner.BLL.MapQuest
         public int GetDistance()
         {
             return (int)_route.Route.Distance;
+        }
+        
+        public string GetRouteInformation()
+        {
+            return string.Join("\n\n", _maneuver.Select(m => "Distance: " + m.Distance + "\n" + "Step: " + m.Narrative));
         }
 
     }

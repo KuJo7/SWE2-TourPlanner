@@ -116,7 +116,7 @@ namespace TourPlanner.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    log.Error("SearchCommand error. Exception: " + ex.Message);
+                    log.Error("SearchCommand error. Exception: " , ex);
                 }
 
             });
@@ -126,6 +126,8 @@ namespace TourPlanner.ViewModels
 
                 FillToursListView();
                 FillLogsListView();
+
+                log.Info("ClearCommand successful");
             });
 
             this.DeleteTourCommand = new RelayCommand(o =>

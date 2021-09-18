@@ -12,5 +12,6 @@ namespace TourPlanner.BLL.MapQuest
         public string LoadImage();
         public bool DoesLocationExist(string location);
         public int GetDistance();
+        public string GetRouteInformation();
     }
 }

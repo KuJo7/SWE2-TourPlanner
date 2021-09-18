@@ -16,9 +16,7 @@ using TourPlanner.ViewModels;
 
 namespace TourPlanner.Views
 {
-    /// <summary>
-    /// Interaktionslogik für AddTourWindow.xaml
-    /// </summary>
+
     public partial class AddTourWindow : Window
     {
         public AddTourWindow(MainViewModel mainWindow)

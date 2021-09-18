@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace TourPlanner.BLL.MapQuest.Models
 {
-    class Route
+    public class Leg
     {
-        public string SessionId { get; set; }
-        public double Distance { get; set; }
-        public List<Leg> Legs { get; set; }
+        public List<Maneuver> Maneuvers { get; set; }
+
     }
 }

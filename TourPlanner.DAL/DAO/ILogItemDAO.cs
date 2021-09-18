@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using TourPlanner.Models;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TourPlanner.DAL.DAO
 {

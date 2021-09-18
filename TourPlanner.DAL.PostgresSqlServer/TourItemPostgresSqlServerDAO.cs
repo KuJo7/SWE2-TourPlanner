@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourPlanner.DAL.Common;
 using TourPlanner.DAL.DAO;
 using TourPlanner.Models;

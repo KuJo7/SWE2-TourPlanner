@@ -128,7 +128,7 @@
                             <Label Content="{Binding CurrentTour.Description}" />
                         </TabItem>
                         <TabItem Header="RouteInfo">
-                            <Label Content="{Binding CurrentTour.RouteInformation}" />
+                            <TextBox Text="{Binding CurrentTour.RouteInformation}" IsReadOnly="True" />
                         </TabItem>
 
                     </TabControl>

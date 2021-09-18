@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TourPlanner.BLL
+namespace TourPlanner.BLL.Factory
 {
     public static class AppManagerFactory
     {
