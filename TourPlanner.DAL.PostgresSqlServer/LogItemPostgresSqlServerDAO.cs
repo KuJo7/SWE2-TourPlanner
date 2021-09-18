@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using log4net;
 using TourPlanner.DAL.Common;
 using TourPlanner.DAL.DAO;
 using TourPlanner.Models;
@@ -11,6 +12,7 @@ namespace TourPlanner.DAL.PostgresSqlServer
 {
     public class LogItemPostgresSqlServerDAO : ILogItemDAO
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private const string SQL_FIND_BY_ID = "SELECT * FROM public.\"logitem\" WHERE \"id\" = @id;";
         private const string SQL_FIND_BY_TOUR_ID = "SELECT * FROM public.\"logitem\" WHERE \"tourid\" = @tourid;";
         private const string SQL_INSERT_NEW_LOG = "INSERT INTO public.\"logitem\"" +
@@ -41,12 +43,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 findCommand = database.CreateCommand(SQL_FIND_BY_ID);
                 database.DefineParameter(findCommand, "@id", DbType.Int32, id);
                 logsList = QueryLogItemsFromDatabase(findCommand);
-                //log.Info("Tourlog " + id + "succesfully found by id in database");
+                log.Info($"Log found by ID {id} in database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error("Could not find tour log by id from database " + ex.Message);
+                log.Error($"Log could not be found by ID {id} in database: {ex}");
             }
             return logsList.FirstOrDefault();
         }
@@ -69,40 +71,40 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 database.DefineParameter(insertCommand, "@minspeed", DbType.Double, minspeed);
                 database.DefineParameter(insertCommand, "@averagestepcount", DbType.Double, averagestepcount);
                 database.DefineParameter(insertCommand, "@burntcalories", DbType.Double, burntcalories);
-                //log.Info("Succesfully added tour log into database for tour " + tourLogItem.Name + " with id " + tourLogItem.Id);
+                log.Info($"Log successfully added for the tour {tour.Name} to database.");
 
             }
             catch (Exception ex)
             {
 
-                //log.Error("Could not add tour log to database " + ex.Message);
+                log.Error($"Log could no be added for the tour {tour.Name} to database: {ex}");
             }
 
             return FindById(database.ExecuteScalar(insertCommand));
         }
 
 
-        public LogItem DeleteItem(LogItem log)
+        public LogItem DeleteItem(LogItem logitem)
         {
             DbCommand deleteCommand = null;
             try
             {
                 deleteCommand = database.CreateCommand(SQL_DELETE_ITEM);
-                database.DefineParameter(deleteCommand, "@id", DbType.Int32, log.Id);
+                database.DefineParameter(deleteCommand, "@id", DbType.Int32, logitem.Id);
 
-                //log.Info($"Tour {name} successfully deleted from database.");
+                log.Info($"Log successfully deleted from database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error($"Tour {name} could no be deleted from database: {ex.Message}");
+                log.Error($"Log could no be deleted from database: {ex}");
             }
 
             database.ExecuteScalar(deleteCommand);
-            return log;
+            return logitem;
         }
 
-        public LogItem UpdateItem(LogItem log)
+        public LogItem UpdateItem(LogItem logitem)
         {
 
             DbCommand updateCommand = null;
@@ -110,29 +112,29 @@ namespace TourPlanner.DAL.PostgresSqlServer
             try
             {
                 updateCommand = database.CreateCommand(SQL_UPDATE_ITEM);
-                database.DefineParameter(updateCommand, "@id", DbType.Int32, log.Id);
-                database.DefineParameter(updateCommand, "@datetime", DbType.DateTime, log.DateTime);
-                database.DefineParameter(updateCommand, "@totaltime", DbType.Time, log.TotalTime);
-                database.DefineParameter(updateCommand, "@report", DbType.String, log.Report);
-                database.DefineParameter(updateCommand, "@distance", DbType.Double, log.Distance);
-                database.DefineParameter(updateCommand, "@rating", DbType.Double, log.Rating);
-                database.DefineParameter(updateCommand, "@averagespeed", DbType.Double, log.AverageSpeed);
-                database.DefineParameter(updateCommand, "@maxspeed", DbType.Double, log.MaxSpeed);
-                database.DefineParameter(updateCommand, "@minspeed", DbType.Double, log.MinSpeed);
-                database.DefineParameter(updateCommand, "@averagestepcount", DbType.Double, log.AverageStepCount);
-                database.DefineParameter(updateCommand, "@burntcalories", DbType.Double, log.BurntCalories);
+                database.DefineParameter(updateCommand, "@id", DbType.Int32, logitem.Id);
+                database.DefineParameter(updateCommand, "@datetime", DbType.DateTime, logitem.DateTime);
+                database.DefineParameter(updateCommand, "@totaltime", DbType.Time, logitem.TotalTime);
+                database.DefineParameter(updateCommand, "@report", DbType.String, logitem.Report);
+                database.DefineParameter(updateCommand, "@distance", DbType.Double, logitem.Distance);
+                database.DefineParameter(updateCommand, "@rating", DbType.Double, logitem.Rating);
+                database.DefineParameter(updateCommand, "@averagespeed", DbType.Double, logitem.AverageSpeed);
+                database.DefineParameter(updateCommand, "@maxspeed", DbType.Double, logitem.MaxSpeed);
+                database.DefineParameter(updateCommand, "@minspeed", DbType.Double, logitem.MinSpeed);
+                database.DefineParameter(updateCommand, "@averagestepcount", DbType.Double, logitem.AverageStepCount);
+                database.DefineParameter(updateCommand, "@burntcalories", DbType.Double, logitem.BurntCalories);
 
-                //log.Info($"Tour {name} successfully deleted from database.");
+                log.Info($"Log successfully deleted from database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error($"Tour {name} could no be deleted from database: {ex.Message}");
+                log.Error($"Log could no be deleted from database: {ex}");
             }
             
 
             database.ExecuteScalar(updateCommand);
-            return log;
+            return logitem;
         }
 
         public IEnumerable<LogItem> GetLogs(TourItem tour)
@@ -142,12 +144,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
             {
                 getLogsCommand = database.CreateCommand(SQL_FIND_BY_TOUR_ID);
                 database.DefineParameter(getLogsCommand, "@tourid", DbType.Int32, tour.Id);
-                //log.Info("Succesfully retrieved logs for tour " + tourItem.Name + " with id " + tourItem.Id);
+                log.Info($"Succesfully retrieved logs for tour {tour.Name}");
 
             }
             catch (Exception ex)
             {
-                //log.Error("Could not retrieve Logs for tour " + tourItem.Id + " from database " + ex.Message);
+                log.Error($"Could not retrieve Logs for tour {tour.Id} from database: {ex}");
             }
             return QueryLogItemsFromDatabase(getLogsCommand);
         }
@@ -177,13 +179,13 @@ namespace TourPlanner.DAL.PostgresSqlServer
                         );
                     }
                 }
-                //log.Info("Succesfully queried tour logs from database");
+                log.Info($"Succesfully queried tour logs from database");
 
             }
             catch (Exception ex)
             {
 
-                //log.Error("Could not query Logs from database " + ex.Message);
+                log.Error($"Could not query Logs from database : {ex}");
             }
 
             return logsList;

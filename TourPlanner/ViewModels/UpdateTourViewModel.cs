@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
+using log4net;
 using TourPlanner.BLL.Factory;
 using TourPlanner.Models;
 
@@ -7,6 +9,7 @@ namespace TourPlanner.ViewModels
 {
     class UpdateTourViewModel : ViewModelBase
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IAppManagerFactory _appManagerFactory;
         private MainViewModel _mainWindow;
         private readonly Window _window;
@@ -69,10 +72,21 @@ namespace TourPlanner.ViewModels
                 CurrentTour.Name = Name;
                 CurrentTour.Description = Description;
 
-                mainWindow.Tours.Clear();
-                mainWindow.Tours.Add(_appManagerFactory.UpdateTour(CurrentTour));
-                mainWindow.FillToursListView();
-                _window?.Close();
+                try
+                {
+                    mainWindow.Tours.Clear();
+                    mainWindow.Tours.Add(_appManagerFactory.UpdateTour(CurrentTour));
+                    mainWindow.FillToursListView();
+                    _window?.Close();
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not Update Tour.");
+                    _window?.Close();
+                    log.Error("UpdateTourCommand error. Exception: ", ex);
+                }
+
             });
 
             this.CancelUpdateTourCommand = new RelayCommand(o =>

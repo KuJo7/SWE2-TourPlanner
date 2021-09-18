@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using log4net;
 using TourPlanner.BLL.Factory;
 using TourPlanner.Models;
 
@@ -8,6 +9,7 @@ namespace TourPlanner.ViewModels
 {
     class UpdateLogViewModel : ViewModelBase
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IAppManagerFactory _appManagerFactory;
         private MainViewModel _mainWindow;
         private readonly Window _window;
@@ -226,14 +228,26 @@ namespace TourPlanner.ViewModels
                 CurrentLog.AverageStepCount = AverageStepCount;
                 CurrentLog.BurntCalories = BurntCalories;
 
-
-                if (CurrentTour != null)
+                try
                 {
-                    _appManagerFactory.UpdateLog(CurrentLog);
-                    mainWindow.FillLogsListView();
+                    if (CurrentTour != null)
+                    {
+                        _appManagerFactory.UpdateLog(CurrentLog);
+                        mainWindow.FillLogsListView();
+                        _window?.Close();
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not Update Log.");
+                    _window?.Close();
+                    log.Error("UpdateLogCommand error. Exception: ", ex);
                 }
 
-                _window?.Close();
             });
 
             this.CancelUpdateLogCommand = new RelayCommand(o =>

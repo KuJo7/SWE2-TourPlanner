@@ -145,12 +145,14 @@ namespace TourPlanner.ViewModels
 
                 CurrentTour = null;
                 FillToursListView();
+                log.Info("DeleteTourCommand successful");
             }); 
             
             this.UpdateTourCommand = new RelayCommand(o =>
             {
                 var view = new UpdateTourWindow(this, CurrentTour);
                 view.ShowDialog();
+                log.Info("UpdateTourCommand successful");
             });
 
             this.CopyTourCommand = new RelayCommand(o =>
@@ -171,13 +173,14 @@ namespace TourPlanner.ViewModels
                 }
                 FillToursListView();
                 FillLogsListView();
-
+                log.Info("CopyTourCommand successful");
             });
 
             this.CreateTourCommand = new RelayCommand(o =>
             {
                 var view = new AddTourWindow(this);
                 view.ShowDialog();
+                
             });
 
             this.DeleteLogCommand = new RelayCommand(o =>
@@ -186,34 +189,39 @@ namespace TourPlanner.ViewModels
                 {
                     Logs.Remove(appManagerFactory.DeleteLog(CurrentLog));
                 }
-
+                log.Info("DeleteTourCommand successful");
             });
 
             this.UpdateLogCommand = new RelayCommand(o => 
             {
                 var view = new UpdateLogWindow(this, CurrentTour, CurrentLog);
                 view.ShowDialog();
+                log.Info("UpdateLogCommand successful");
             });
 
             this.CreateLogCommand = new RelayCommand(o =>
             {
                 var view = new AddLogWindow(this, CurrentTour);
                 view.ShowDialog();
+                log.Info("CreateLogCommand successful");
             });
 
             this.ImportCommand = new RelayCommand(o =>
             {
                 Tours.Add(appManagerFactory.ImportTour());
+                log.Info("ImportCommand successful");
             });
 
             this.ExportCommand = new RelayCommand(o =>
             {
                 appManagerFactory.ExportTour(CurrentTour);
+                log.Info("ExportCommand successful");
             });
 
             this.PrintTourCommand = new RelayCommand(o =>
             {
                 appManagerFactory.PrintTour(CurrentTour, this._appManagerFactory.GetLogs(CurrentTour).ToList());
+                log.Info("PrintTourCommand successful");
             });
 
             this.PrintAllCommand = new RelayCommand(o =>
@@ -229,6 +237,7 @@ namespace TourPlanner.ViewModels
 
 
                 appManagerFactory.PrintAll(allLogs);
+                log.Info("PrintAllCommand successful");
             });
 
             InitToursListView();

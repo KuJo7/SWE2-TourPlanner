@@ -8,6 +8,7 @@ namespace TourPlanner.ViewModels
 {
     class AddLogViewModel : ViewModelBase
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IAppManagerFactory _appManagerFactory;
         private MainViewModel _mainWindow;
         private readonly Window _window;
@@ -200,11 +201,26 @@ namespace TourPlanner.ViewModels
 
             this.AddLogCommand = new RelayCommand(o =>
             {
-                if (CurrentTour != null)
-                    mainWindow.Logs.Add(_appManagerFactory.CreateLog(CurrentTour, DateTime, Report, Distance, TotalTime, Rating, AverageSpeed, MaxSpeed, MinSpeed, 
-                        AverageStepCount, BurntCalories));
+                try
+                {
+                    if (CurrentTour != null)
+                    {
+                        mainWindow.Logs.Add(_appManagerFactory.CreateLog(CurrentTour, DateTime, Report, Distance, TotalTime, Rating, AverageSpeed, MaxSpeed, MinSpeed,
+                            AverageStepCount, BurntCalories));
+                        _window?.Close();
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not Add Log.");
+                    _window?.Close();
+                    log.Error("AddLogCommand error. Exception: ", ex);
+                }
 
-                _window?.Close();
             });
 
             this.CancelAddLogCommand = new RelayCommand(o =>

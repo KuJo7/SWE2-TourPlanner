@@ -6,10 +6,6 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-	<ItemGroup>
-		<Compile Remove="AssemblyInfo.cs" />
-	</ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
@@ -18,6 +14,12 @@
   <ItemGroup>
     <ProjectReference Include="..\TourPlanner.BLL\TourPlanner.BLL.csproj" />
     <ProjectReference Include="..\TourPlanner.Models\TourPlanner.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="logging.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

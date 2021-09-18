@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using log4net;
 using TourPlanner.DAL.Common;
 using TourPlanner.DAL.DAO;
 using TourPlanner.Models;
@@ -11,6 +12,7 @@ namespace TourPlanner.DAL.PostgresSqlServer
 {
     public class TourItemPostgresSqlServerDAO : ITourItemDAO
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private const string SQL_FIND_BY_ID = "SELECT * FROM public.\"touritem\" WHERE \"id\" = @id;";
         private const string SQL_GET_ALL_ITEMS = "SELECT * FROM public.\"touritem\";";
         private const string SQL_INSERT_NEW_ITEM = "INSERT INTO public.\"touritem\"" +
@@ -40,12 +42,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 findCommand = database.CreateCommand(SQL_FIND_BY_ID);
                 database.DefineParameter(findCommand, "@id", DbType.Int32, id);
                 toursList = QueryTourItemsFromDatabase(findCommand);
-                //log.Info($"Tour found by ID {itemId} in database.");
+                log.Info($"Tour found by ID {id} in database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error("Tour could not be found by ID {itemId} in database: {ex.Message}");
+                log.Error($"Tour could not be found by ID {id} in database: {ex}");
             }
             return toursList.FirstOrDefault();
         }
@@ -63,12 +65,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 database.DefineParameter(insertCommand, "@routeinformation", DbType.String, routeinformation);
                 database.DefineParameter(insertCommand, "@distance", DbType.Int32, distance);
                 database.DefineParameter(insertCommand, "@imagepath", DbType.String, imagepath);
-                //log.Info($"Tour {name} successfully added to database.");
+                log.Info($"Tour {name} successfully added to database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error($"Tour {name} could no be added to database: {ex.Message}");
+                log.Error($"Tour {name} could no be added to database: {ex}");
             }
 
             return FindById(database.ExecuteScalar(insertCommand));
@@ -82,12 +84,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 deleteCommand = database.CreateCommand(SQL_DELETE_ITEM);
                 database.DefineParameter(deleteCommand, "@id", DbType.Int32, tour.Id);
 
-                //log.Info($"Tour {name} successfully deleted from database.");
+                log.Info($"Tour {tour.Name} successfully deleted from database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error($"Tour {name} could no be deleted from database: {ex.Message}");
+                log.Error($"Tour {tour.Name} could no be deleted from database: {ex}");
             }
 
             database.ExecuteScalar(deleteCommand);
@@ -109,12 +111,12 @@ namespace TourPlanner.DAL.PostgresSqlServer
                 database.DefineParameter(updateCommand, "@distance", DbType.Int32, tour.Distance);
                 database.DefineParameter(updateCommand, "@imagepath", DbType.String, tour.ImagePath);
 
-                //log.Info($"Tour {name} successfully deleted from database.");
+                log.Info($"Tour {tour.Name} successfully deleted from database.");
 
             }
             catch (Exception ex)
             {
-                //log.Error($"Tour {name} could no be deleted from database: {ex.Message}");
+                log.Error($"Tour {tour.Name} could no be deleted from database: {ex}");
             }
 
             database.ExecuteScalar(updateCommand);
@@ -149,11 +151,11 @@ namespace TourPlanner.DAL.PostgresSqlServer
                         ));
                     }
                 }
-                //log.Info("Tours fetched successfully from database");
+                log.Info("Tours fetched successfully from database");
             }
             catch (Exception ex)
             {
-                //log.Error("Tours could not be fetched from database: {ex.Message}");
+                log.Error($"Tours could not be fetched from database: {ex}");
             }
 
             return toursList;

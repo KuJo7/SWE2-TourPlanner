@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using log4net;
 using TourPlanner.BLL.Factory;
 using TourPlanner.Models;
 
@@ -12,6 +13,7 @@ namespace TourPlanner.ViewModels
 {
     class AddTourViewModel : ViewModelBase
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IAppManagerFactory _appManagerFactory;
         private MainViewModel _mainWindow;
         private readonly Window _window;
@@ -86,15 +88,25 @@ namespace TourPlanner.ViewModels
             this.AddTourCommand = new RelayCommand(o =>
             {
                 var tour = _appManagerFactory.CreateTour(Name, Description, From, To);
-                if (tour != null)
+                try
                 {
-                    mainWindow.Tours.Add(tour);
-                    _window?.Close();
+
+                    if (tour != null)
+                    {
+                        mainWindow.Tours.Add(tour);
+                        _window?.Close();
+                        log.Info("CreateTourCommand successful");
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     MessageBox.Show("Could not Add Tour.");
                     _window?.Close();
+                    log.Error("AddTourCommand error. Exception: ", ex);
                 }
 
             });
