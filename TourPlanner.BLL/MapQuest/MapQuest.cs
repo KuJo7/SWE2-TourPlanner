@@ -68,10 +68,8 @@ namespace TourPlanner.BLL.MapQuest
 
         public bool DoesLocationExist(string location)
         {
-            var task = Task.Run(() => _client.GetAsync(_baseUrl + "/geocoding/v1/address?key=" + _apiKey + "&location=" + location));
-            task.Wait();
-
-            var stringJsonResponse = task.Result.Content.ReadAsStringAsync().Result;
+            var stringJsonResponse = _client
+                .GetStringAsync(_baseUrl + "/geocoding/v1/address?key=" + _apiKey + "&location=" + location).Result;
 
             JObject jSonResponse = JObject.Parse(stringJsonResponse);
 

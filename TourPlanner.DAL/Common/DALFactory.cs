@@ -65,67 +65,7 @@ namespace TourPlanner.DAL.Common
             return Activator.CreateInstance(tourType) as ITourItemDAO;
         }
 
-        public static ITourItemDAO DeleteTourItemDAO()
-        {
-            string className = assemblyName + ".TourItemPostgresSqlServerDAO";
-            if (useFileSystem)
-            {
-                className = assemblyName + ".TourItemFileServerDAO";
-            }
-            Type tourType = dalAssembly.GetType(className);
-
-            return Activator.CreateInstance(tourType) as ITourItemDAO;
-        }
-
-        public static ITourItemDAO UpdateTourItemDAO()
-        {
-            string className = assemblyName + ".TourItemPostgresSqlServerDAO";
-            if (useFileSystem)
-            {
-                className = assemblyName + ".TourItemFileServerDAO";
-            }
-            Type tourType = dalAssembly.GetType(className);
-
-            return Activator.CreateInstance(tourType) as ITourItemDAO;
-        }
-
-        public static ILogItemDAO CreateTourLogDAO()
-        {
-            string className = assemblyName + ".LogItemPostgresSqlServerDAO";
-            if (useFileSystem)
-            {
-                className = assemblyName + ".LogItemFileServerDAO";
-            }
-            Type logType = dalAssembly.GetType(className);
-
-            return Activator.CreateInstance(logType) as ILogItemDAO;
-        }
-
         public static ILogItemDAO CreateLogItemDAO()
-        {
-            string className = assemblyName + ".LogItemPostgresSqlServerDAO";
-            if (useFileSystem)
-            {
-                className = assemblyName + ".LogItemFileServerDAO";
-            }
-            Type logType = dalAssembly.GetType(className);
-
-            return Activator.CreateInstance(logType) as ILogItemDAO;
-        }
-
-        public static ILogItemDAO DeleteLogItemDAO()
-        {
-            string className = assemblyName + ".LogItemPostgresSqlServerDAO";
-            if (useFileSystem)
-            {
-                className = assemblyName + ".LogItemFileServerDAO";
-            }
-            Type logType = dalAssembly.GetType(className);
-
-            return Activator.CreateInstance(logType) as ILogItemDAO;
-        }
-
-        public static ILogItemDAO UpdateLogItemDAO()
         {
             string className = assemblyName + ".LogItemPostgresSqlServerDAO";
             if (useFileSystem)

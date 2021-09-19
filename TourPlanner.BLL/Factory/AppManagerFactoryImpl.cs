@@ -78,19 +78,19 @@ namespace TourPlanner.BLL.Factory
 
         public TourItem DeleteTour(TourItem currentTour)
         {
-            ITourItemDAO tourItemDAO = DALFactory.DeleteTourItemDAO();
+            ITourItemDAO tourItemDAO = DALFactory.CreateTourItemDAO();
             return tourItemDAO.DeleteItem(currentTour);
         }
 
         public TourItem UpdateTour(TourItem currentTour)
         {
-            ITourItemDAO tourItemDAO = DALFactory.UpdateTourItemDAO();
+            ITourItemDAO tourItemDAO = DALFactory.CreateTourItemDAO();
             return tourItemDAO.UpdateItem(currentTour);
         }
 
         public IEnumerable<LogItem> GetLogs(TourItem tour)
         {
-            ILogItemDAO logItemDAO = DALFactory.CreateTourLogDAO();
+            ILogItemDAO logItemDAO = DALFactory.CreateLogItemDAO();
             return logItemDAO.GetLogs(tour);
         }
 
@@ -102,13 +102,13 @@ namespace TourPlanner.BLL.Factory
         }
         public LogItem DeleteLog(LogItem log)
         {
-            ILogItemDAO logItemDAO = DALFactory.DeleteLogItemDAO();
+            ILogItemDAO logItemDAO = DALFactory.CreateLogItemDAO();
             return logItemDAO.DeleteItem(log);
         }
 
         public LogItem UpdateLog(LogItem log)
         {
-            ILogItemDAO logItemDAO = DALFactory.UpdateLogItemDAO();
+            ILogItemDAO logItemDAO = DALFactory.CreateLogItemDAO();
             return logItemDAO.UpdateItem(log);
         }
 

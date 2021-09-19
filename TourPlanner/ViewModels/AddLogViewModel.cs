@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using log4net;
 using TourPlanner.BLL.Factory;
 using TourPlanner.Models;
 
