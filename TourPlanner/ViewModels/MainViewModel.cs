@@ -132,7 +132,6 @@ namespace TourPlanner.ViewModels
 
             this.DeleteTourCommand = new RelayCommand(o =>
             {
-                Tours.Remove(appManagerFactory.DeleteTour(CurrentTour));
                 IEnumerable<LogItem> logsOfCurrentTour = Logs.Where(x => x.TourItem.Id.Equals(CurrentTour.Id));
                 
                 foreach (LogItem item in logsOfCurrentTour)
@@ -143,6 +142,7 @@ namespace TourPlanner.ViewModels
                     }
                 }
 
+                Tours.Remove(appManagerFactory.DeleteTour(CurrentTour));
                 CurrentTour = null;
                 FillToursListView();
                 log.Info("DeleteTourCommand successful");
