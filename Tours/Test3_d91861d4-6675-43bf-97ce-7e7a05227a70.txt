@@ -1,1 +1,0 @@
-{"Id":1,"Name":"Test3","Description":"Test3","From":"Test3","To":"Test3","RouteInformation":"Test3","Distance":0,"ImagePath":"Test3"}

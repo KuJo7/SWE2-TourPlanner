@@ -47,9 +47,12 @@ namespace TourPlanner.BLL.Reporting
                     stack.Item().Text("To: " + _tour.To);
                     stack.Item().Text("Distance: " + _tour.Distance);
                     stack.Item().Text("Description: " + _tour.Description);
-                    stack.Item().Text("Route Information: " + _tour.RouteInformation);
+                    stack.Item().Text("Route Information: ");
 
-
+                    foreach(var line in _tour.RouteInformation.Split("\n"))
+                    {
+                        stack.Item().Text(line);
+                    }
 
                     foreach (var log in _tourLogs)
                     {
